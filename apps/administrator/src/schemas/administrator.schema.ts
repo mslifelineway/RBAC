@@ -1,5 +1,6 @@
 import { AbstractDocument } from '@app/common';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { DEFAULT_ADMINISTRATOR_ROLE } from '../constants';
 
 @Schema({ versionKey: false })
 export class Administrator extends AbstractDocument {
@@ -20,6 +21,9 @@ export class Administrator extends AbstractDocument {
 
   @Prop({ required: false, default: '' })
   image: string;
+
+  @Prop({ required: false, default: DEFAULT_ADMINISTRATOR_ROLE })
+  role?: string;
 
   @Prop({ required: false, default: true })
   isActive: boolean;

@@ -32,7 +32,6 @@ export class AdministratorService {
   async createAdministrator(
     request: CreateAdministratorDto,
   ): Promise<Administrator> {
-    this.logger.warn("request in admin servie________", request)
     await this.validateCreateAdministratorRequest(request);
     const administrator = await this.administratorRepository.create({
       ...request,

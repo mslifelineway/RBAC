@@ -1,4 +1,7 @@
 export const messages = {
   UNAUTHORIZED: 'You are not authorized.',
   NO_VALUE_FOR_UNAUTHORIZED: 'No values are provided for authentication',
+  LOGIN_SUCCESS: 'Logged In Successfully.',
+  LOGOUT_SUCCESS: 'Logged Out Successfully.',
+  ACCOUNT_CREATED: 'Account Created Successfully.',
 };

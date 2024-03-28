@@ -3,15 +3,19 @@ import {
   ExecutionContext,
   Inject,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Observable, catchError, tap } from 'rxjs';
 import { AUTH_SERVICE } from './auth.constant';
 import { ClientProxy } from '@nestjs/microservices';
-import { VALIDATE_USER, contextTypes, messages } from '../constants';
+import { VALIDATE_USER, contextTypes } from '../constants';
+import { getAuthenticationFromContext } from './helper';
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
+  private readonly logger = new Logger();
+
   constructor(@Inject(AUTH_SERVICE) private authClient: ClientProxy) {}
 
   canActivate(
@@ -19,7 +23,7 @@ export class JwtAuthGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
     return this.authClient
       .send(VALIDATE_USER, {
-        Authentication: this.getAuthentication(context),
+        Authentication: getAuthenticationFromContext(context),
       })
       .pipe(
         tap((res) => {
@@ -29,20 +33,6 @@ export class JwtAuthGuard implements CanActivate {
           throw new UnauthorizedException();
         }),
       );
-  }
-
-  getAuthentication(context: ExecutionContext) {
-    let authentication: string;
-    if (context.getType() === contextTypes.HTTP) {
-      authentication = context.switchToHttp().getRequest()
-        .cookies?.Authentication;
-    } else if (context.getType() === contextTypes.RPC) {
-      authentication = context.switchToRpc().getData().Authentication;
-    }
-
-    if (!authentication)
-      throw new UnauthorizedException(messages.NO_VALUE_FOR_UNAUTHORIZED);
-    return authentication;
   }
 
   private addUser(user: any, context: ExecutionContext) {

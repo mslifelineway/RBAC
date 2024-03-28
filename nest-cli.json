@@ -45,6 +45,15 @@
       "compilerOptions": {
         "tsConfigPath": "libs/common/tsconfig.lib.json"
       }
+    },
+    "permission": {
+      "type": "application",
+      "root": "apps/permission",
+      "entryFile": "main",
+      "sourceRoot": "apps/permission/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/permission/tsconfig.app.json"
+      }
     }
   }
 }

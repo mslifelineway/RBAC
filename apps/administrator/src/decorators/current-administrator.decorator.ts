@@ -1,7 +1,7 @@
 import { ExecutionContext, createParamDecorator } from '@nestjs/common';
 import { Administrator } from '../schemas/administrator.schema';
 
-const getCurrentAdministrator = (
+export const getCurrentAdministrator = (
   context: ExecutionContext,
 ): Administrator => {
   if (context.getType() === 'http') {
