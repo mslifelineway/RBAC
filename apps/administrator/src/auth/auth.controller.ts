@@ -31,7 +31,7 @@ export class AdministratorAuthController {
   async create(
     @Body() createDto: CreateAdministratorDto,
   ): Promise<Administrator> {
-    return this.administratorService.createAdministrator(createDto);
+    return await this.administratorService.createAdministrator(createDto);
   }
 
   @UseGuards(LocalAuthGuard)
@@ -40,8 +40,8 @@ export class AdministratorAuthController {
     @CurrentAdministrator() administrator: Administrator,
     @Res({ passthrough: true }) response: Response,
   ) {
-    await this.administratorAuthService.login(administrator, response);
-    return response.status(HttpStatus.OK).json({
+    this.administratorAuthService.login(administrator, response);
+    response.status(HttpStatus.OK).json({
       data: administrator,
       message: messages.LOGIN_SUCCESS,
     });
@@ -49,15 +49,13 @@ export class AdministratorAuthController {
 
   @UseGuards(JwtAdministratorAuthGuard)
   @MessagePattern(VALIDATE_USER)
-  async validateUser(@CurrentAdministrator() administrator: Administrator) {
+  validateUser(@CurrentAdministrator() administrator: Administrator) {
     return administrator;
   }
 
   @Post('logout')
   async logout(@Res({ passthrough: true }) response: Response) {
     this.administratorAuthService.logout(response);
-    return response
-      .status(HttpStatus.OK)
-      .json({ message: messages.LOGOUT_SUCCESS });
+    response.status(HttpStatus.OK).json({ message: messages.LOGOUT_SUCCESS });
   }
 }

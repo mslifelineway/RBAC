@@ -14,6 +14,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Permission, PermissionSchema } from './schemas/permission.schema';
 import { AdministratorRoleGuard } from '../../administrator/src/auth/guards';
 import { PERMISSION_SERVICE } from './constants';
+import { PermissionRepository } from './permission.repository';
 
 @Module({
   imports: [
@@ -37,6 +38,11 @@ import { PERMISSION_SERVICE } from './constants';
     AuthModule,
   ],
   controllers: [PermissionController],
-  providers: [PermissionService, JwtAuthGuard, AdministratorRoleGuard],
+  providers: [
+    PermissionService,
+    PermissionRepository,
+    JwtAuthGuard,
+    AdministratorRoleGuard,
+  ],
 })
 export class PermissionModule {}

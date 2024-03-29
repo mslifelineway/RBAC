@@ -4,7 +4,7 @@ import { Types, SchemaTypes } from 'mongoose';
 
 @Schema({ versionKey: false })
 export class Permission extends AbstractDocument {
-  @Prop({ required: true, trim: true })
+  @Prop({ unique: true, required: true, trim: true })
   name: string;
   @Prop({ required: true, trim: true })
   description: string;
@@ -19,10 +19,10 @@ export class Permission extends AbstractDocument {
   updatedBy: Types.ObjectId;
 
   @Prop({ type: Date, default: Date.now })
-  createdAt: Types.ObjectId;
+  createdAt: Date;
 
   @Prop({ type: Date, default: Date.now })
-  updatedAt: Types.ObjectId;
+  updatedAt: Date;
 }
 
 export const PermissionSchema = SchemaFactory.createForClass(Permission);

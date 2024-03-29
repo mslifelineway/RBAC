@@ -1,4 +1,8 @@
-import { Logger, NotFoundException } from '@nestjs/common';
+import {
+  InternalServerErrorException,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   Connection,
   FilterQuery,
@@ -25,15 +29,13 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
       ...document,
       _id: new Types.ObjectId(),
     });
-    return (
-      await createDocument.save(options)
-    ).toJSON() as unknown as TDocument;
+    const doc = await createDocument.save(options);
+    return doc.toJSON() as unknown as TDocument;
   }
 
   async findOne(filterQuery: FilterQuery<TDocument>): Promise<TDocument> {
     const document = await this.model.findOne(filterQuery, {}, { lean: true });
     if (!document) {
-      this.logger.warn('Document not found with filterQuery', filterQuery);
       throw new NotFoundException('Document not found');
     }
     return document as unknown as TDocument;
@@ -49,7 +51,6 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     });
 
     if (!document) {
-      this.logger.warn(`Document not found with filterQuery:`, filterQuery);
       throw new NotFoundException('Document not found.');
     }
 
@@ -60,7 +61,7 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     filterQuery: FilterQuery<TDocument>,
     document: Partial<TDocument>,
   ) {
-    return this.model.findOneAndUpdate(filterQuery, document, {
+    return await this.model.findOneAndUpdate(filterQuery, document, {
       lean: true,
       upsert: true,
       new: true,
@@ -68,7 +69,11 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
   }
 
   async find(filterQuery: FilterQuery<TDocument>) {
-    return this.model.find(filterQuery, {}, { lean: true });
+    try {
+      return await this.model.find(filterQuery, {}, { lean: true });
+    } catch (error) {
+      throw new InternalServerErrorException('Error while fetching data.');
+    }
   }
 
   async startTransaction() {

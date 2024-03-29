@@ -1,5 +1,6 @@
 import {
   Injectable,
+  InternalServerErrorException,
   Logger,
   UnauthorizedException,
   UnprocessableEntityException,
@@ -20,13 +21,13 @@ export class AdministratorService {
   async getAdministrators(
     getAdministratorsArgs: Partial<Administrator>,
   ): Promise<Administrator[]> {
-    return this.administratorRepository.find(getAdministratorsArgs);
+    return await this.administratorRepository.find(getAdministratorsArgs);
   }
 
   async getAdministrator(
     getAdministratorArgs: Partial<Administrator>,
   ): Promise<Administrator> {
-    return this.administratorRepository.findOne(getAdministratorArgs);
+    return await this.administratorRepository.findOne(getAdministratorArgs);
   }
 
   async createAdministrator(
@@ -43,14 +44,15 @@ export class AdministratorService {
   private async validateCreateAdministratorRequest(
     request: CreateAdministratorDto,
   ) {
-    let administrator: Administrator;
     try {
-      administrator = await this.administratorRepository.findOne({
+      const administrator = await this.administratorRepository.findOne({
         email: request.email,
       });
-    } catch (error) {}
-    if (administrator) {
-      throw new UnprocessableEntityException('Email already exists.');
+      if (administrator) {
+        throw new UnprocessableEntityException('Email already exists.');
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
     }
   }
 

@@ -4,4 +4,5 @@ export const messages = {
   LOGIN_SUCCESS: 'Logged In Successfully.',
   LOGOUT_SUCCESS: 'Logged Out Successfully.',
   ACCOUNT_CREATED: 'Account Created Successfully.',
+  PERMISSION_CREATED: 'Permission Created Successfully.',
 };

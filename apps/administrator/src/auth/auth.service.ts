@@ -13,7 +13,7 @@ export class AdministratorAuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async login(administrator: Administrator, response: Response) {
+  login(administrator: Administrator, response: Response) {
     const payload: TokenPayload = {
       _id: administrator._id.toHexString(),
       firstName: administrator.lastName,
@@ -29,7 +29,7 @@ export class AdministratorAuthService {
 
     const token = this.jwtService.sign(payload);
 
-    return response.cookie(Authentication, token, {
+    response.cookie(Authentication, token, {
       ...cookiesOptions,
       expires,
     });
