@@ -4,8 +4,9 @@ import { Types, SchemaTypes } from 'mongoose';
 
 @Schema({ versionKey: false })
 export class Permission extends AbstractDocument {
-  @Prop({ unique: true, required: true, trim: true })
+  @Prop({ unique: true, required: true, trim: true})
   name: string;
+
   @Prop({ required: true, trim: true })
   description: string;
 

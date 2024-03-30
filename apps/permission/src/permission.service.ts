@@ -4,8 +4,6 @@ import {
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { PermissionRepository } from './permission.repository';
-import { CreatePermissionDto } from './dtos/create-permission.dto';
-import { AdministratorRequest } from '../../administrator/src/auth/types';
 import { Permission } from './schemas/permission.schema';
 
 @Injectable()
@@ -13,26 +11,21 @@ export class PermissionService {
   private readonly logger = new Logger();
   constructor(private readonly permissionRepository: PermissionRepository) {}
 
-  async create(
-    createDto: CreatePermissionDto,
-    req: AdministratorRequest,
-  ): Promise<Permission> {
-    const doc = await this.validateCreatePermissionRequest(createDto);
+  async create(data: Permission): Promise<Permission> {
+    const doc = await this.validateCreatePermissionRequest(data);
     if (doc)
       throw new UnprocessableEntityException(
-        `Permission '${createDto.name}' already exists.`,
+        `Permission '${data.name}' already exists.`,
       );
-    return await this.permissionRepository.create({
-      ...createDto,
-      createdBy: req.user?._id,
-      updatedBy: req.user?._id,
-    });
+    return await this.permissionRepository.create(data);
   }
 
   private async validateCreatePermissionRequest(
-    request: CreatePermissionDto,
+    request: Permission,
   ): Promise<Permission> {
-    return await this.permissionRepository.findOne({ name: request.name });
+    try {
+      return await this.permissionRepository.findOne({ name: request.name });
+    } catch (error) {}
   }
 
   async getPermissions(args: Partial<Permission>): Promise<Permission[]> {
@@ -41,5 +34,12 @@ export class PermissionService {
 
   async getPermission(args: Partial<Permission>): Promise<Permission> {
     return await this.permissionRepository.findOne(args);
+  }
+
+  async updatePermission(updateData: Permission) {
+    return await this.permissionRepository.findOneAndUpdate(
+      { _id: updateData._id },
+      updateData,
+    );
   }
 }

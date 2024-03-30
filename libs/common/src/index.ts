@@ -4,3 +4,5 @@ export * from './database';
 export * from './dtos';
 export * from './rmq';
 export * from './errors';
+
+export * from './enums';
