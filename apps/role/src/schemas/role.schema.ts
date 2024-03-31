@@ -1,5 +1,6 @@
 import { AbstractDocument } from '@app/common';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Permission } from '../../../permission/src/schemas/permission.schema';
 import { Types, SchemaTypes } from 'mongoose';
 
 @Schema({ versionKey: false })
@@ -16,8 +17,8 @@ export class Role extends AbstractDocument {
   @Prop({ required: false, default: false })
   isDeleted: boolean;
 
-  @Prop({ required: true, type: SchemaTypes.ObjectId, ref: 'Permission' })
-  permissions: Types.ObjectId[];
+  @Prop({ type: [{ type: SchemaTypes.ObjectId, ref: 'Permission' }] })
+  permissions: Permission[];
 
   @Prop({ required: true, type: SchemaTypes.ObjectId, ref: 'Administrator' })
   createdBy: Types.ObjectId;

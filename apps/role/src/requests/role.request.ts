@@ -15,7 +15,7 @@ export class RoleRequest {
     this.doc.description = data?.description;
     this.doc.isActive = data?.isActive;
     this.doc.isDeleted = data?.isDeleted;
-    this.doc.permissions = data?.permissions || [];
+    this.doc.permissions = data?.permissions;
 
     this.doc.createdAt = data?.createdAt;
     this.doc.updatedAt = new Date();
