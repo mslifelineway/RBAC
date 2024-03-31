@@ -14,4 +14,9 @@ export const messages = {
   ROLE_STATUS_UPDATED: 'Role Status Updated Successfully.',
   ROLE_DELETED: 'Role Deleted Successfully.',
   ROLE_RECOVERED: 'Role Recovered Successfully.',
+  EMPLOYEE_CREATED: 'Employee Created Successfully.',
+  EMPLOYEE_UPDATED: 'Employee Updated Successfully.',
+  EMPLOYEE_STATUS_UPDATED: 'Employee Status Updated Successfully.',
+  EMPLOYEE_DELETED: 'Employee Deleted Successfully.',
+  EMPLOYEE_RECOVERED: 'Employee Recovered Successfully.',
 };

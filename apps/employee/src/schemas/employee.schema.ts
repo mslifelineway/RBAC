@@ -1,9 +1,10 @@
 import { AbstractDocument } from '@app/common';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { DEFAULT_ADMINISTRATOR_ROLE } from '../constants';
+import { SchemaTypes, Types } from 'mongoose';
+import { Role } from 'apps/role/src/schemas/role.schema';
 
 @Schema({ versionKey: false })
-export class Administrator extends AbstractDocument {
+export class Employee extends AbstractDocument {
   @Prop({ required: true, unique: true, trim: true })
   email: string;
 
@@ -22,8 +23,8 @@ export class Administrator extends AbstractDocument {
   @Prop({ required: false, default: '' })
   image: string;
 
-  @Prop({ required: false, default: DEFAULT_ADMINISTRATOR_ROLE })
-  role: string;
+  @Prop({ type: [{ type: SchemaTypes.ObjectId, ref: 'Role' }] })
+  roles: Role[];
 
   @Prop({ required: false, default: true })
   isActive: boolean;
@@ -31,10 +32,17 @@ export class Administrator extends AbstractDocument {
   @Prop({ required: false, default: false })
   isDeleted: boolean;
 
+  @Prop({ required: true, type: SchemaTypes.ObjectId, ref: 'Administrator' })
+  createdBy: Types.ObjectId;
+
+  @Prop({ required: true, type: SchemaTypes.ObjectId, ref: 'Administrator' })
+  updatedBy: Types.ObjectId;
+
   @Prop({ type: Date, default: Date.now })
   createdAt: Date;
 
   @Prop({ type: Date, default: Date.now })
-  updatedAt: Date;}
+  updatedAt: Date;
+}
 
-export const AdministratorSchema = SchemaFactory.createForClass(Administrator);
+export const EmployeeSchema = SchemaFactory.createForClass(Employee);

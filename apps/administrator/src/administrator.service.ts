@@ -30,20 +30,20 @@ export class AdministratorService {
     return await this.administratorRepository.findOne(getAdministratorArgs);
   }
 
-  async createAdministrator(
-    request: CreateAdministratorDto,
-  ): Promise<Administrator> {
-    await this.validateCreateAdministratorRequest(request);
-    const administrator = await this.administratorRepository.create({
-      ...request,
-      password: await bcrypt.hash(request.password, 10),
-    });
-    return administrator;
+  async create(data: Administrator): Promise<Administrator> {
+    await this.validateCreateAdministratorRequest(data);
+    try {
+      const administrator = await this.administratorRepository.create({
+        ...data,
+        password: await bcrypt.hash(data.password, 10),
+      });
+      return administrator;
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
   }
 
-  private async validateCreateAdministratorRequest(
-    request: CreateAdministratorDto,
-  ) {
+  private async validateCreateAdministratorRequest(request: Administrator) {
     try {
       const administrator = await this.administratorRepository.findOne({
         email: request.email,

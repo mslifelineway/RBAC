@@ -11,12 +11,13 @@ import { CreateAdministratorDto } from '../dtos/create-administrator.dto';
 import { Administrator } from '../schemas/administrator.schema';
 import { CurrentAdministrator } from '../decorators/current-administrator.decorator';
 import { Response } from 'express';
-import { VALIDATE_USER, messages } from '@app/common';
+import { RequestActionsEnum, VALIDATE_USER, messages } from '@app/common';
 import { MessagePattern } from '@nestjs/microservices';
 import { AdministratorAuthService } from './auth.service';
 import { AdministratorService } from '../administrator.service';
 import LocalAuthGuard from './guards/local-auth.guard';
 import JwtAdministratorAuthGuard from './guards/jwt-auth.guard';
+import { AdministratorRequest } from '../requests/administrator.request';
 
 @Controller('auth')
 export class AdministratorAuthController {
@@ -31,7 +32,11 @@ export class AdministratorAuthController {
   async create(
     @Body() createDto: CreateAdministratorDto,
   ): Promise<Administrator> {
-    return await this.administratorService.createAdministrator(createDto);
+    const createRequest = new AdministratorRequest(
+      createDto,
+      RequestActionsEnum.CREATE,
+    ).doc;
+    return await this.administratorService.create(createRequest);
   }
 
   @UseGuards(LocalAuthGuard)
