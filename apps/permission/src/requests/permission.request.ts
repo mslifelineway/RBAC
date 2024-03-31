@@ -10,45 +10,42 @@ export class PermissionRequest {
     action: RequestActionsEnum,
     administrator: Administrator,
   ) {
-    if (data) {
-      this.doc._id = data._id;
-      this.doc.name = data.name;
-      this.doc.description = data.description;
-      this.doc.isActive = data.isActive;
+    this.doc._id = data?._id;
+    this.doc.name = data?.name;
+    this.doc.description = data?.description;
+    this.doc.isActive = data?.isActive;
+    this.doc.isDeleted = data?.isDeleted;
 
-      this.doc.createdAt = data.createdAt;
-      this.doc.updatedAt = data.updatedAt;
-      this.doc.createdBy = data.createdBy;
-      this.doc.updatedBy = data.updatedBy;
+    this.doc.createdAt = data?.createdAt;
+    this.doc.updatedAt = new Date();
+    this.doc.createdBy = data?.createdBy;
+    this.doc.updatedBy = administrator._id;
 
-      switch (action) {
-        case RequestActionsEnum.CREATE:
-          this.doc._id = new Types.ObjectId();
-          this.doc.createdBy = administrator._id;
-          this.doc.updatedBy = administrator._id;
-          this.doc.createdAt = new Date();
-          this.doc.updatedAt = new Date();
-          break;
-        case RequestActionsEnum.DELETE:
-          this.doc.isActive = false;
-          this.doc.updatedBy = administrator._id;
-          this.doc.updatedAt = new Date();
-          break;
-        case RequestActionsEnum.UPDATE:
-          this.doc.updatedBy = administrator._id;
-          this.doc.updatedAt = new Date();
-          break;
-        case RequestActionsEnum.UPDATE_STATUS:
-          this.doc.isActive = !data.isActive;
-          this.doc.updatedBy = administrator._id;
-          this.doc.updatedAt = new Date();
-          break;
-        case RequestActionsEnum.RESTORE:
-          this.doc.isActive = true;
-          this.doc.updatedBy = administrator._id;
-          this.doc.updatedAt = new Date();
-          break;
-      }
+    switch (action) {
+      case RequestActionsEnum.CREATE:
+        this.doc._id = new Types.ObjectId();
+        this.doc.createdBy = administrator._id;
+        this.doc.updatedBy = administrator._id;
+        this.doc.createdAt = new Date();
+
+        break;
+
+      case RequestActionsEnum.UPDATE:
+        break;
+
+      case RequestActionsEnum.UPDATE_STATUS:
+        this.doc.isActive = !data?.isActive;
+        break;
+
+      case RequestActionsEnum.RECOVER:
+        this.doc.isActive = true;
+        this.doc.isDeleted = false;
+        break;
+
+      case RequestActionsEnum.DELETE:
+        this.doc.isActive = false;
+        this.doc.isDeleted = true;
+        break;
     }
   }
 }

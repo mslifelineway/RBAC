@@ -3,5 +3,5 @@ export enum RequestActionsEnum {
   DELETE = 'DELETE',
   UPDATE = 'UPDATE',
   UPDATE_STATUS = 'UPDATE_STATUS',
-  RESTORE = 'RESTORE',
+  RECOVER = 'RECOVER',
 }

@@ -28,18 +28,38 @@ export class PermissionService {
     } catch (error) {}
   }
 
-  async getPermissions(args: Partial<Permission>): Promise<Permission[]> {
+  async findAll(args: Partial<Permission>): Promise<Permission[]> {
     return await this.permissionRepository.find(args);
   }
 
-  async getPermission(args: Partial<Permission>): Promise<Permission> {
+  async findOne(args: Partial<Permission>): Promise<Permission> {
     return await this.permissionRepository.findOne(args);
   }
 
-  async updatePermission(updateData: Permission) {
+  async updateOne(updateData: Permission) {
     return await this.permissionRepository.findOneAndUpdate(
       { _id: updateData._id },
       updateData,
+    );
+  }
+
+  async updateStatus(data: Permission) {
+    return await this.permissionRepository.findOneAndUpdate(
+      { _id: data._id },
+      data,
+    );
+  }
+
+  async recover(data: Permission) {
+    return await this.permissionRepository.findOneAndUpdate(
+      { _id: data._id },
+      data,
+    );
+  }
+  async delete(data: Permission) {
+    return await this.permissionRepository.findOneAndUpdate(
+      { _id: data._id },
+      data,
     );
   }
 }

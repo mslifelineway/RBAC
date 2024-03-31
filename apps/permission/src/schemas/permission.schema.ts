@@ -4,7 +4,7 @@ import { Types, SchemaTypes } from 'mongoose';
 
 @Schema({ versionKey: false })
 export class Permission extends AbstractDocument {
-  @Prop({ unique: true, required: true, trim: true})
+  @Prop({ unique: true, required: true, trim: true })
   name: string;
 
   @Prop({ required: true, trim: true })
@@ -12,6 +12,9 @@ export class Permission extends AbstractDocument {
 
   @Prop({ required: false, default: true })
   isActive: boolean;
+
+  @Prop({ required: false, default: false })
+  isDeleted: boolean;
 
   @Prop({ required: true, type: SchemaTypes.ObjectId, ref: 'Administrator' })
   createdBy: Types.ObjectId;

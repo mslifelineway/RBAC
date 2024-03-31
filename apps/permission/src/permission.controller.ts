@@ -1,11 +1,13 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpStatus,
   InternalServerErrorException,
   Logger,
   Param,
+  Patch,
   Post,
   Put,
   Req,
@@ -18,6 +20,7 @@ import {
   JwtAuthGuard,
   RequestActionsEnum,
   ValidateParamIDDto,
+  ValidateParamStatusDto,
   messages,
 } from '@app/common';
 import { CreatePermissionDto } from './dtos/create-permission.dto';
@@ -29,12 +32,13 @@ import { PermissionRequest } from './requests/permission.request';
 import { toObjectId } from '@app/common/utils/helpers';
 
 @Controller('permissions')
-@UseGuards(JwtAuthGuard, AdministratorRoleGuard)
+// @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
 export class PermissionController {
   private readonly logger = new Logger();
 
   constructor(private readonly permissionService: PermissionService) {}
 
+  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
   @Post()
   async create(
     @Body() createDto: CreatePermissionDto,
@@ -57,9 +61,10 @@ export class PermissionController {
     }
   }
 
+  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
   @Get()
   async getAll(@Res() res: any) {
-    const permissions = await this.permissionService.getPermissions({});
+    const permissions = await this.permissionService.findAll({});
     res.status(HttpStatus.OK).json({
       data: permissions,
       count: permissions.length,
@@ -67,9 +72,10 @@ export class PermissionController {
     });
   }
 
+  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
   @Get(':id')
   async getOne(@Param() { id }: ValidateParamIDDto, @Res() res: any) {
-    const permission = await this.permissionService.getPermission({
+    const permission = await this.permissionService.findOne({
       _id: new mongoose.Types.ObjectId(id),
     });
     res.status(HttpStatus.OK).json({
@@ -78,6 +84,7 @@ export class PermissionController {
     });
   }
 
+  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
   @Put(':id')
   async update(
     @Param() { id }: ValidateParamIDDto,
@@ -92,10 +99,85 @@ export class PermissionController {
         req.user,
       ).doc;
       updateRequest._id = toObjectId(id);
-      const doc = await this.permissionService.updatePermission(updateRequest);
-      return res.status(HttpStatus.CREATED).json({
+      const doc = await this.permissionService.updateOne(updateRequest);
+      return res.status(HttpStatus.OK).json({
         data: doc,
-        message: messages.PERMISSION_CREATED,
+        message: messages.PERMISSION_UPDATED,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
+  @Patch(':id/status')
+  async updateStatus(
+    @Param() { id }: ValidateParamIDDto,
+    @Req() req: AdministratorRequest,
+    @Res() res: Response,
+  ) {
+    try {
+      const currentDoc = await this.permissionService.findOne({
+        _id: toObjectId(id),
+      });
+      const updateDoc = new PermissionRequest(
+        currentDoc,
+        RequestActionsEnum.UPDATE_STATUS,
+        req.user,
+      ).doc;
+      const doc = await this.permissionService.updateStatus(updateDoc);
+      return res.status(HttpStatus.OK).json({
+        data: doc,
+        message: messages.PERMISSION_STATUS_UPDATED,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
+  @Patch(':id/recover')
+  async recover(
+    @Param() { id }: ValidateParamIDDto,
+    @Req() req: AdministratorRequest,
+    @Res() res: Response,
+  ) {
+    try {
+      const updateRequest = new PermissionRequest(
+        null,
+        RequestActionsEnum.RECOVER,
+        req.user,
+      ).doc;
+      updateRequest._id = toObjectId(id);
+      const doc = await this.permissionService.recover(updateRequest);
+      return res.status(HttpStatus.OK).json({
+        data: doc,
+        message: messages.PERMISSION_RECOVERED,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
+  @Delete(':id')
+  async delete(
+    @Param() { id }: ValidateParamIDDto,
+    @Req() req: AdministratorRequest,
+    @Res() res: Response,
+  ) {
+    try {
+      const updateRequest = new PermissionRequest(
+        null,
+        RequestActionsEnum.DELETE,
+        req.user,
+      ).doc;
+      updateRequest._id = toObjectId(id);
+      this.logger.warn("______delete data:", JSON.stringify(updateRequest))
+      const doc = await this.permissionService.delete(updateRequest);
+      return res.status(HttpStatus.NO_CONTENT).json({
+        data: doc,
+        message: messages.PERMISSION_DELETED,
       });
     } catch (error) {
       throw new InternalServerErrorException(error.message);
