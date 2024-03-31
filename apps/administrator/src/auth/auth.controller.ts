@@ -50,6 +50,10 @@ export class AdministratorAuthController {
   @UseGuards(JwtAdministratorAuthGuard)
   @MessagePattern(VALIDATE_USER)
   validateUser(@CurrentAdministrator() administrator: Administrator) {
+    this.logger.warn(
+      '################### administrator data in validate user in auth.controller ####',
+      JSON.stringify(administrator),
+    );
     return administrator;
   }
 

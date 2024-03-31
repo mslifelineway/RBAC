@@ -66,6 +66,26 @@ services:
       - /usr/src/app/node_modules
     ports:
       - '8082:8082'
+  role:
+    build:
+      context: .
+      dockerfile: ./apps/role/Dockerfile
+      target: development
+    command: npm run start:dev role
+    env_file:
+      - ./apps/role/.env
+    depends_on:
+      - mongodb-primary
+      - mongodb-secondary
+      - mongodb-arbiter
+      - rabbitmq
+      - administrator
+      - permission
+    volumes:
+      - .:/usr/src/apps
+      - /usr/src/app/node_modules
+    ports:
+      - '8083:8083'
 
   rabbitmq:
     image: rabbitmq

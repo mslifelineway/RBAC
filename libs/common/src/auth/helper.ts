@@ -1,4 +1,8 @@
-import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import {
+  ExecutionContext,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { contextTypes, messages } from '../constants';
 
 export const getAuthenticationFromContext = (context: ExecutionContext) => {
@@ -12,5 +16,10 @@ export const getAuthenticationFromContext = (context: ExecutionContext) => {
 
   if (!authentication)
     throw new UnauthorizedException(messages.NO_VALUE_FOR_UNAUTHORIZED);
+  const logger = new Logger();
+  logger.warn(
+    '################### AUTHENTICATION in jwt header ####',
+    authentication,
+  );
   return authentication;
 };

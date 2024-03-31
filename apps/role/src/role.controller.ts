@@ -14,46 +14,47 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { PermissionService } from './permission.service';
+import { RoleService } from './role.service';
 import { AdministratorRoleGuard } from 'apps/administrator/src/auth/guards';
 import {
   JwtAuthGuard,
   RequestActionsEnum,
   ValidateParamIDDto,
+  ValidateParamStatusDto,
   messages,
 } from '@app/common';
-import { CreatePermissionDto } from './dtos/create-permission.dto';
+import { CreateRoleDto } from './dtos/create.dto';
 import { AdministratorRequest } from '../../administrator/src/auth/types';
 import { Response } from 'express';
 import mongoose from 'mongoose';
-import { UpdatePermissionDto } from './dtos/update-permission.dto';
-import { PermissionRequest } from './requests/permission.request';
+import { UpdateRoleDto } from './dtos/update.dto';
+import { RoleRequest } from './requests/role.request';
 import { toObjectId } from '@app/common/utils/helpers';
 
-@Controller('permissions')
+@Controller('roles')
 // @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
-export class PermissionController {
+export class RoleController {
   private readonly logger = new Logger();
 
-  constructor(private readonly permissionService: PermissionService) {}
+  constructor(private readonly RoleService: RoleService) {}
 
   @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
   @Post()
   async create(
-    @Body() createDto: CreatePermissionDto,
+    @Body() createDto: CreateRoleDto,
     @Req() req: AdministratorRequest,
     @Res() res: Response,
   ) {
     try {
-      const createRequest = new PermissionRequest(
+      const createRequest = new RoleRequest(
         createDto,
         RequestActionsEnum.CREATE,
         req.user,
       ).doc;
-      const doc = await this.permissionService.create(createRequest);
+      const doc = await this.RoleService.create(createRequest);
       return res.status(HttpStatus.CREATED).json({
         data: doc,
-        message: messages.PERMISSION_CREATED,
+        message: messages.ROLE_CREATED,
       });
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -63,23 +64,23 @@ export class PermissionController {
   @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
   @Get()
   async getAll(@Res() res: any) {
-    const permissions = await this.permissionService.findAll({});
+    const Roles = await this.RoleService.findAll({});
     res.status(HttpStatus.OK).json({
-      data: permissions,
-      count: permissions.length,
-      message: 'List of permissions.',
+      data: Roles,
+      count: Roles.length,
+      message: 'List of Roles.',
     });
   }
 
   @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
   @Get(':id')
   async getOne(@Param() { id }: ValidateParamIDDto, @Res() res: any) {
-    const permission = await this.permissionService.findOne({
+    const Role = await this.RoleService.findOne({
       _id: new mongoose.Types.ObjectId(id),
     });
     res.status(HttpStatus.OK).json({
-      data: permission,
-      messages: 'Permission details.',
+      data: Role,
+      messages: 'Role details.',
     });
   }
 
@@ -87,21 +88,21 @@ export class PermissionController {
   @Put(':id')
   async update(
     @Param() { id }: ValidateParamIDDto,
-    @Body() updateDto: UpdatePermissionDto,
+    @Body() updateDto: UpdateRoleDto,
     @Req() req: AdministratorRequest,
     @Res() res: Response,
   ) {
     try {
-      const updateRequest = new PermissionRequest(
+      const updateRequest = new RoleRequest(
         updateDto,
         RequestActionsEnum.UPDATE,
         req.user,
       ).doc;
       updateRequest._id = toObjectId(id);
-      const doc = await this.permissionService.updateOne(updateRequest);
+      const doc = await this.RoleService.updateOne(updateRequest);
       return res.status(HttpStatus.OK).json({
         data: doc,
-        message: messages.PERMISSION_UPDATED,
+        message: messages.ROLE_UPDATED,
       });
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -116,18 +117,18 @@ export class PermissionController {
     @Res() res: Response,
   ) {
     try {
-      const currentDoc = await this.permissionService.findOne({
+      const currentDoc = await this.RoleService.findOne({
         _id: toObjectId(id),
       });
-      const updateDoc = new PermissionRequest(
+      const updateDoc = new RoleRequest(
         currentDoc,
         RequestActionsEnum.UPDATE_STATUS,
         req.user,
       ).doc;
-      const doc = await this.permissionService.updateStatus(updateDoc);
+      const doc = await this.RoleService.updateStatus(updateDoc);
       return res.status(HttpStatus.OK).json({
         data: doc,
-        message: messages.PERMISSION_STATUS_UPDATED,
+        message: messages.ROLE_STATUS_UPDATED,
       });
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -142,16 +143,16 @@ export class PermissionController {
     @Res() res: Response,
   ) {
     try {
-      const updateRequest = new PermissionRequest(
+      const updateRequest = new RoleRequest(
         null,
         RequestActionsEnum.RECOVER,
         req.user,
       ).doc;
       updateRequest._id = toObjectId(id);
-      const doc = await this.permissionService.recover(updateRequest);
+      const doc = await this.RoleService.recover(updateRequest);
       return res.status(HttpStatus.OK).json({
         data: doc,
-        message: messages.PERMISSION_RECOVERED,
+        message: messages.ROLE_RECOVERED,
       });
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -166,16 +167,17 @@ export class PermissionController {
     @Res() res: Response,
   ) {
     try {
-      const updateRequest = new PermissionRequest(
+      const updateRequest = new RoleRequest(
         null,
         RequestActionsEnum.DELETE,
         req.user,
       ).doc;
       updateRequest._id = toObjectId(id);
-      const doc = await this.permissionService.delete(updateRequest);
+      this.logger.warn('______delete data:', JSON.stringify(updateRequest));
+      const doc = await this.RoleService.delete(updateRequest);
       return res.status(HttpStatus.NO_CONTENT).json({
         data: doc,
-        message: messages.PERMISSION_DELETED,
+        message: messages.ROLE_DELETED,
       });
     } catch (error) {
       throw new InternalServerErrorException(error.message);

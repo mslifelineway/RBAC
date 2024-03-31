@@ -36,6 +36,7 @@ export class JwtAuthGuard implements CanActivate {
   }
 
   private addUser(user: any, context: ExecutionContext) {
+    this.logger.warn("####### adding logged in user to request ####")
     if (context.getType() === contextTypes.HTTP) {
       context.switchToRpc().getData().user = user;
     } else if (context.getType() === contextTypes.RPC) {

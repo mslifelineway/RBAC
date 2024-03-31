@@ -9,4 +9,9 @@ export const messages = {
   PERMISSION_STATUS_UPDATED: 'Permission Status Updated Successfully.',
   PERMISSION_DELETED: 'Permission Deleted Successfully.',
   PERMISSION_RECOVERED: 'Permission Recovered Successfully.',
+  ROLE_CREATED: 'Role Created Successfully.',
+  ROLE_UPDATED: 'Role Updated Successfully.',
+  ROLE_STATUS_UPDATED: 'Role Status Updated Successfully.',
+  ROLE_DELETED: 'Role Deleted Successfully.',
+  ROLE_RECOVERED: 'Role Recovered Successfully.',
 };
