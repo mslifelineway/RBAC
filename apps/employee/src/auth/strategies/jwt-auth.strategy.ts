@@ -2,10 +2,10 @@ import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { AdministratorService } from '../../administrator.service';
 import { JWT_SECRET, messages } from '@app/common';
 import { TokenPayload } from '../types/auth.type';
 import { Types } from 'mongoose';
+import { EmployeeService } from '../../employee.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -13,7 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   constructor(
     configService: ConfigService,
-    private readonly administratorService: AdministratorService,
+    private readonly employeeService: EmployeeService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
@@ -24,10 +24,13 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: TokenPayload) {
+    this.logger.warn(
+      '====>>>>> >>>>>>>>> validate in jwt srategy in employee:',
+      JSON.stringify(payload),
+    );
     const { _id } = payload;
-    this.logger.warn("_______ validate in jwt startegy in admin", JSON.stringify(payload))
     try {
-      return await this.administratorService.getAdministrator({
+      return await this.employeeService.findOne({
         _id: _id as unknown as Types.ObjectId,
       });
     } catch (err) {

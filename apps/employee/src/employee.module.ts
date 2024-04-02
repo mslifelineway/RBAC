@@ -4,11 +4,20 @@ import { EmployeeService } from './employee.service';
 import { EmployeeRepository } from './employee.repository';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
-import { AuthModule, DatabaseModule, JwtAuthGuard, RmqModule, envPaths } from '@app/common';
+import {
+  AuthModule,
+  DatabaseModule,
+  JwtAuthGuard,
+  JwtEmployeeAuthGuard,
+  RmqModule,
+  envPaths,
+} from '@app/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Employee, EmployeeSchema } from './schemas/employee.schema';
 import { EMPLOYEE_SERVICE } from './constants';
 import { AdministratorRoleGuard } from 'apps/administrator/src/auth/guards';
+import { EmployeeAuthModule } from './auth/auth.module';
+import { JwtStrategy } from './auth/strategies';
 
 @Module({
   imports: [
@@ -17,6 +26,7 @@ import { AdministratorRoleGuard } from 'apps/administrator/src/auth/guards';
       validationSchema: Joi.object({
         PORT: Joi.number().required(),
         MONGODB_URI: Joi.string().required(),
+        RABBIT_MQ_URI: Joi.string().required(),
         RABBIT_MQ_AUTH_QUEUE: Joi.string().required(),
         RABBIT_MQ_EMPLOYEE_QUEUE: Joi.string().required(),
       }),
@@ -29,14 +39,18 @@ import { AdministratorRoleGuard } from 'apps/administrator/src/auth/guards';
     RmqModule.register({
       name: EMPLOYEE_SERVICE,
     }),
+    EmployeeAuthModule,
     AuthModule,
   ],
   controllers: [EmployeeController],
   providers: [
     EmployeeService,
     EmployeeRepository,
-    JwtAuthGuard,
-    AdministratorRoleGuard,
+    JwtStrategy,
+    JwtEmployeeAuthGuard,
+    // JwtAuthGuard,
+    // AdministratorRoleGuard,
   ],
+  exports: [EmployeeService]
 })
 export class EmployeeModule {}

@@ -18,6 +18,7 @@ import { EmployeeService } from './employee.service';
 import { AdministratorRoleGuard } from 'apps/administrator/src/auth/guards';
 import {
   JwtAuthGuard,
+  JwtEmployeeAuthGuard,
   RequestActionsEnum,
   ValidateParamIDDto,
   messages,
@@ -29,6 +30,7 @@ import mongoose from 'mongoose';
 import { UpdateEmployeeDto } from './dtos/update.dto';
 import { EmployeeRequest } from './requests/employee.request';
 import { toObjectId } from '@app/common/utils/helpers';
+import * as bcrypt from 'bcrypt';
 
 @Controller('Employees')
 export class EmployeeController {
@@ -36,7 +38,7 @@ export class EmployeeController {
 
   constructor(private readonly EmployeeService: EmployeeService) {}
 
-  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
+  // @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
   @Post()
   async create(
     @Body() createDto: CreateEmployeeDto,
@@ -49,6 +51,7 @@ export class EmployeeController {
         RequestActionsEnum.CREATE,
         req.user,
       ).doc;
+      createRequest.password = await bcrypt.hash(createRequest.password, 10);
       const doc = await this.EmployeeService.create(createRequest);
       return res.status(HttpStatus.CREATED).json({
         data: doc,
@@ -59,7 +62,7 @@ export class EmployeeController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get()
   async getAll(@Res() res: any) {
     const Employees = await this.EmployeeService.findAll({});
@@ -70,8 +73,8 @@ export class EmployeeController {
     });
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get(':id')
+  @UseGuards(JwtEmployeeAuthGuard)
   async getOne(@Param() { id }: ValidateParamIDDto, @Res() res: any) {
     const Employee = await this.EmployeeService.findOne({
       _id: new mongoose.Types.ObjectId(id),
@@ -82,7 +85,7 @@ export class EmployeeController {
     });
   }
 
-  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
+  // @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
   @Put(':id')
   async update(
     @Param() { id }: ValidateParamIDDto,
@@ -107,7 +110,7 @@ export class EmployeeController {
     }
   }
 
-  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
+  // @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
   @Patch(':id/status')
   async updateStatus(
     @Param() { id }: ValidateParamIDDto,
@@ -133,7 +136,7 @@ export class EmployeeController {
     }
   }
 
-  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
+  // @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
   @Patch(':id/recover')
   async recover(
     @Param() { id }: ValidateParamIDDto,
@@ -157,7 +160,7 @@ export class EmployeeController {
     }
   }
 
-  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
+  // @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
   @Delete(':id')
   async delete(
     @Param() { id }: ValidateParamIDDto,

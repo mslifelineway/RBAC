@@ -8,7 +8,6 @@ import {
 import * as bcrypt from 'bcrypt';
 import { AdministratorRepository } from './administrator.repository';
 import { Administrator } from './schemas/administrator.schema';
-import { CreateAdministratorDto } from './dtos/create-administrator.dto';
 
 @Injectable()
 export class AdministratorService {
@@ -58,6 +57,7 @@ export class AdministratorService {
 
   async validateAdministrator(email: string, password: string) {
     const user = await this.administratorRepository.findOne({ email });
+    this.logger.warn("======> validate admin in admin service::", JSON.stringify(user), email, password)
     const passwordIsValid = await bcrypt.compare(password, user.password);
     if (!passwordIsValid) {
       throw new UnauthorizedException('Credentials are not valid.');

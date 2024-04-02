@@ -1,15 +1,17 @@
 import {
   Injectable,
   Logger,
+  UnauthorizedException,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { EmployeeRepository } from './employee.repository';
 import { Employee } from './schemas/employee.schema';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class EmployeeService {
   private readonly logger = new Logger();
-  constructor(private readonly EmployeeRepository: EmployeeRepository) {}
+  constructor(private readonly employeeRepository: EmployeeRepository) {}
 
   async create(data: Employee): Promise<Employee> {
     const doc = await this.validateCreateEmployeeRequest(data);
@@ -17,49 +19,59 @@ export class EmployeeService {
       throw new UnprocessableEntityException(
         `Email '${data.email}' already exists.`,
       );
-    return await this.EmployeeRepository.create(data);
+    return await this.employeeRepository.create(data);
   }
 
   private async validateCreateEmployeeRequest(
     request: Employee,
   ): Promise<Employee> {
     try {
-      return await this.EmployeeRepository.findOne({ email: request.email });
+      return await this.employeeRepository.findOne({ email: request.email });
     } catch (error) {}
   }
 
   async findAll(args: Partial<Employee>): Promise<Employee[]> {
-    return await this.EmployeeRepository.find(args);
+    return await this.employeeRepository.find(args);
   }
 
   async findOne(args: Partial<Employee>): Promise<Employee> {
-    return await this.EmployeeRepository.findOne(args);
+    return await this.employeeRepository.findOne(args);
   }
 
   async updateOne(updateData: Employee) {
-    return await this.EmployeeRepository.findOneAndUpdate(
+    return await this.employeeRepository.findOneAndUpdate(
       { _id: updateData._id },
       updateData,
     );
   }
 
   async updateStatus(data: Employee) {
-    return await this.EmployeeRepository.findOneAndUpdate(
+    return await this.employeeRepository.findOneAndUpdate(
       { _id: data._id },
       data,
     );
   }
 
   async recover(data: Employee) {
-    return await this.EmployeeRepository.findOneAndUpdate(
+    return await this.employeeRepository.findOneAndUpdate(
       { _id: data._id },
       data,
     );
   }
   async delete(data: Employee) {
-    return await this.EmployeeRepository.findOneAndUpdate(
+    return await this.employeeRepository.findOneAndUpdate(
       { _id: data._id },
       data,
     );
+  }
+
+  async validateEmployee(email: string, password: string) {
+    const user = await this.employeeRepository.findOne({ email });
+    this.logger.warn("======> validate emp in emp service::", JSON.stringify(user), email, password)
+    const passwordIsValid = await bcrypt.compare(password, user.password);
+    if (!passwordIsValid) {
+      throw new UnauthorizedException('Credentials are not valid.');
+    }
+    return user;
   }
 }

@@ -1,0 +1,1 @@
+export const EMPLOYEE_AUTH_SERVICE = 'EMPLOYEE_AUTH';
