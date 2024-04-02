@@ -38,7 +38,7 @@ export class EmployeeController {
 
   constructor(private readonly EmployeeService: EmployeeService) {}
 
-  // @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
+  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
   @Post()
   async create(
     @Body() createDto: CreateEmployeeDto,
@@ -74,7 +74,7 @@ export class EmployeeController {
   }
 
   @Get(':id')
-  @UseGuards(JwtEmployeeAuthGuard)
+  // @UseGuards(JwtEmployeeAuthGuard)
   async getOne(@Param() { id }: ValidateParamIDDto, @Res() res: any) {
     const Employee = await this.EmployeeService.findOne({
       _id: new mongoose.Types.ObjectId(id),
@@ -85,7 +85,7 @@ export class EmployeeController {
     });
   }
 
-  // @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
+  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
   @Put(':id')
   async update(
     @Param() { id }: ValidateParamIDDto,
@@ -110,7 +110,7 @@ export class EmployeeController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
+  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
   @Patch(':id/status')
   async updateStatus(
     @Param() { id }: ValidateParamIDDto,
@@ -136,7 +136,7 @@ export class EmployeeController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
+  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
   @Patch(':id/recover')
   async recover(
     @Param() { id }: ValidateParamIDDto,
@@ -160,7 +160,7 @@ export class EmployeeController {
     }
   }
 
-  // @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
+  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
   @Delete(':id')
   async delete(
     @Param() { id }: ValidateParamIDDto,
