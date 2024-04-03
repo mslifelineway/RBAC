@@ -7,6 +7,8 @@ import {
 import { EmployeeRepository } from './employee.repository';
 import { Employee } from './schemas/employee.schema';
 import * as bcrypt from 'bcrypt';
+import { ProjectionType } from 'mongoose';
+import { EmployeLoginDetails } from './auth/types';
 
 @Injectable()
 export class EmployeeService {
@@ -34,8 +36,11 @@ export class EmployeeService {
     return await this.employeeRepository.find(args);
   }
 
-  async findOne(args: Partial<Employee>): Promise<Employee> {
-    return await this.employeeRepository.findOne(args);
+  async findOne(
+    args: Partial<Employee>,
+    projection: ProjectionType<Employee> = {},
+  ): Promise<Employee> {
+    return await this.employeeRepository.findOne(args, projection);
   }
 
   async updateOne(updateData: Employee) {
@@ -67,11 +72,20 @@ export class EmployeeService {
 
   async validateEmployee(email: string, password: string) {
     const user = await this.employeeRepository.findOne({ email });
-    this.logger.warn("======> validate emp in emp service::", JSON.stringify(user), email, password)
+    this.logger.warn(
+      '======> validate emp in emp service::',
+      JSON.stringify(user),
+      email,
+      password,
+    );
     const passwordIsValid = await bcrypt.compare(password, user.password);
     if (!passwordIsValid) {
       throw new UnauthorizedException('Credentials are not valid.');
     }
     return user;
+  }
+
+  async getLoginDetails(args: Partial<Employee>): Promise<EmployeLoginDetails> {
+    return await this.employeeRepository.getLoginDetails(args);
   }
 }

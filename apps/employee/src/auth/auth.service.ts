@@ -5,21 +5,23 @@ import { TokenPayload } from './types/auth.type';
 import { ConfigService } from '@nestjs/config';
 import { Authentication, JWT_EXPIRATION, cookiesOptions } from '@app/common';
 import { JwtService } from '@nestjs/jwt';
+import { EmployeeService } from '../employee.service';
 
 @Injectable()
 export class EmployeeAuthService {
   constructor(
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
+    private readonly employeeService: EmployeeService,
   ) {}
 
-  login(Employee: Employee, response: Response) {
+  async login(employee: Employee, response: Response) {
     const payload: TokenPayload = {
-      _id: Employee._id.toHexString(),
-      firstName: Employee.lastName,
-      lastName: Employee.lastName,
-      fullName: `${Employee.firstName} ${Employee.lastName}`,
-      email: Employee.email,
+      _id: employee._id.toHexString(),
+      firstName: employee.lastName,
+      lastName: employee.lastName,
+      fullName: `${employee.firstName} ${employee.lastName}`,
+      email: employee.email,
     };
 
     const expires = new Date();
@@ -33,6 +35,7 @@ export class EmployeeAuthService {
       ...cookiesOptions,
       expires,
     });
+    return await this.employeeService.getLoginDetails({ _id: employee._id });
   }
 
   logout(response: Response) {

@@ -21,36 +21,39 @@ export class EmployeeAuthController {
   private readonly logger = new Logger();
 
   constructor(
-    private readonly EmployeeAuthService: EmployeeAuthService,
-    private readonly EmployeeService: EmployeeService,
+    private readonly employeeAuthService: EmployeeAuthService,
+    private readonly employeeService: EmployeeService,
   ) {}
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(
-    @CurrentEmployee() Employee: Employee,
+    @CurrentEmployee() employee: Employee,
     @Res({ passthrough: true }) response: Response,
   ) {
-    this.EmployeeAuthService.login(Employee, response);
+    const loginDetails = await this.employeeAuthService.login(
+      employee,
+      response,
+    );
     response.status(HttpStatus.OK).json({
-      data: Employee,
+      data: loginDetails,
       message: messages.LOGIN_SUCCESS,
     });
   }
 
   @UseGuards(JwtEmployeeAuthGuard)
   @MessagePattern(VALIDATE_EMPLOYEE)
-  validateUser(@CurrentEmployee() Employee: Employee) {
+  validateUser(@CurrentEmployee() employee: Employee) {
     this.logger.warn(
       '################### Employee data in validate user in auth.controller ####',
       JSON.stringify(Employee),
     );
-    return Employee;
+    return employee;
   }
 
   @Post('logout')
   async logout(@Res({ passthrough: true }) response: Response) {
-    this.EmployeeAuthService.logout(response);
+    this.employeeAuthService.logout(response);
     response.status(HttpStatus.OK).json({ message: messages.LOGOUT_SUCCESS });
   }
 }

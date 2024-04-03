@@ -30,9 +30,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     );
     const { _id } = payload;
     try {
-      return await this.employeeService.findOne({
+      const doc = await this.employeeService.findOne({
         _id: _id as unknown as Types.ObjectId,
       });
+      return doc;
     } catch (err) {
       throw new UnauthorizedException(messages.UNAUTHORIZED);
     }

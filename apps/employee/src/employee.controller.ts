@@ -31,12 +31,13 @@ import { UpdateEmployeeDto } from './dtos/update.dto';
 import { EmployeeRequest } from './requests/employee.request';
 import { toObjectId } from '@app/common/utils/helpers';
 import * as bcrypt from 'bcrypt';
+import { EmployeLoginDetails } from './auth/types';
 
 @Controller('Employees')
 export class EmployeeController {
   private readonly logger = new Logger();
 
-  constructor(private readonly EmployeeService: EmployeeService) {}
+  constructor(private readonly employeeService: EmployeeService) {}
 
   @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
   @Post()
@@ -52,7 +53,7 @@ export class EmployeeController {
         req.user,
       ).doc;
       createRequest.password = await bcrypt.hash(createRequest.password, 10);
-      const doc = await this.EmployeeService.create(createRequest);
+      const doc = await this.employeeService.create(createRequest);
       return res.status(HttpStatus.CREATED).json({
         data: doc,
         message: messages.EMPLOYEE_CREATED,
@@ -65,7 +66,7 @@ export class EmployeeController {
   // @UseGuards(JwtAuthGuard)
   @Get()
   async getAll(@Res() res: any) {
-    const Employees = await this.EmployeeService.findAll({});
+    const Employees = await this.employeeService.findAll({});
     res.status(HttpStatus.OK).json({
       data: Employees,
       count: Employees.length,
@@ -76,11 +77,11 @@ export class EmployeeController {
   @Get(':id')
   // @UseGuards(JwtEmployeeAuthGuard)
   async getOne(@Param() { id }: ValidateParamIDDto, @Res() res: any) {
-    const Employee = await this.EmployeeService.findOne({
+    const employee = await this.employeeService.findOne({
       _id: new mongoose.Types.ObjectId(id),
     });
     res.status(HttpStatus.OK).json({
-      data: Employee,
+      data: employee,
       messages: 'Employee details.',
     });
   }
@@ -100,7 +101,7 @@ export class EmployeeController {
         req.user,
       ).doc;
       updateRequest._id = toObjectId(id);
-      const doc = await this.EmployeeService.updateOne(updateRequest);
+      const doc = await this.employeeService.updateOne(updateRequest);
       return res.status(HttpStatus.OK).json({
         data: doc,
         message: messages.EMPLOYEE_UPDATED,
@@ -118,7 +119,7 @@ export class EmployeeController {
     @Res() res: Response,
   ) {
     try {
-      const currentDoc = await this.EmployeeService.findOne({
+      const currentDoc = await this.employeeService.findOne({
         _id: toObjectId(id),
       });
       const updateDoc = new EmployeeRequest(
@@ -126,7 +127,7 @@ export class EmployeeController {
         RequestActionsEnum.UPDATE_STATUS,
         req.user,
       ).doc;
-      const doc = await this.EmployeeService.updateStatus(updateDoc);
+      const doc = await this.employeeService.updateStatus(updateDoc);
       return res.status(HttpStatus.OK).json({
         data: doc,
         message: messages.EMPLOYEE_STATUS_UPDATED,
@@ -150,7 +151,7 @@ export class EmployeeController {
         req.user,
       ).doc;
       updateRequest._id = toObjectId(id);
-      const doc = await this.EmployeeService.recover(updateRequest);
+      const doc = await this.employeeService.recover(updateRequest);
       return res.status(HttpStatus.OK).json({
         data: doc,
         message: messages.EMPLOYEE_RECOVERED,
@@ -174,7 +175,7 @@ export class EmployeeController {
         req.user,
       ).doc;
       updateRequest._id = toObjectId(id);
-      const doc = await this.EmployeeService.delete(updateRequest);
+      const doc = await this.employeeService.delete(updateRequest);
       return res.status(HttpStatus.NO_CONTENT).json({
         data: doc,
         message: messages.EMPLOYEE_DELETED,

@@ -37,6 +37,7 @@ export class EmployeeRequest {
         break;
 
       case RequestActionsEnum.UPDATE:
+        this.doc.password = undefined;
         break;
 
       case RequestActionsEnum.UPDATE_STATUS:

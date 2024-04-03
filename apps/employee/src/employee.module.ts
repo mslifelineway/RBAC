@@ -15,9 +15,14 @@ import {
 import { MongooseModule } from '@nestjs/mongoose';
 import { Employee, EmployeeSchema } from './schemas/employee.schema';
 import { EMPLOYEE_SERVICE } from './constants';
-import { AdministratorRoleGuard } from 'apps/administrator/src/auth/guards';
+import { AdministratorRoleGuard } from '../../administrator/src/auth/guards';
 import { EmployeeAuthModule } from './auth/auth.module';
 import { JwtStrategy } from './auth/strategies';
+import { Role, RoleSchema } from '../../role/src/schemas/role.schema';
+import {
+  Permission,
+  PermissionSchema,
+} from '../../permission/src/schemas/permission.schema';
 
 @Module({
   imports: [
@@ -35,6 +40,8 @@ import { JwtStrategy } from './auth/strategies';
     DatabaseModule,
     MongooseModule.forFeature([
       { name: Employee.name, schema: EmployeeSchema },
+      { name: Role.name, schema: RoleSchema },
+      { name: Permission.name, schema: PermissionSchema },
     ]),
     RmqModule.register({
       name: EMPLOYEE_SERVICE,
@@ -51,6 +58,6 @@ import { JwtStrategy } from './auth/strategies';
     // JwtAuthGuard,
     // AdministratorRoleGuard,
   ],
-  exports: [EmployeeService]
+  exports: [EmployeeService],
 })
 export class EmployeeModule {}

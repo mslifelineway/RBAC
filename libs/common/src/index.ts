@@ -5,4 +5,6 @@ export * from './dtos';
 export * from './rmq';
 export * from './errors';
 
+export * from './utils';
+
 export * from './enums';

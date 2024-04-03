@@ -11,3 +11,7 @@ export interface TokenPayload {
 export interface EmployeeRequest extends Request {
   user: Employee;
 }
+
+export type EmployeLoginDetails = Partial<Employee> & {
+  permissions: string[];
+};

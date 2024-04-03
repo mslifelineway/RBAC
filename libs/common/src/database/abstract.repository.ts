@@ -7,6 +7,7 @@ import {
   Connection,
   FilterQuery,
   Model,
+  ProjectionType,
   SaveOptions,
   Types,
   UpdateQuery,
@@ -33,8 +34,13 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     return doc.toJSON() as unknown as TDocument;
   }
 
-  async findOne(filterQuery: FilterQuery<TDocument>): Promise<TDocument> {
-    const document = await this.model.findOne(filterQuery, {}, { lean: true });
+  async findOne(
+    filterQuery: FilterQuery<TDocument>,
+    projection: ProjectionType<TDocument> = {},
+  ): Promise<TDocument> {
+    const document = await this.model.findOne(filterQuery, projection, {
+      lean: true,
+    });
     if (!document) {
       throw new NotFoundException('Document not found');
     }
