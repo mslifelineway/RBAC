@@ -15,15 +15,18 @@ export class AdministratorRoleGuard implements CanActivate {
 
   constructor(private reflector: Reflector) {}
 
-  matchRoles(roles: string[], currentUserRole: string) {
-    return roles.some((role) => role === currentUserRole);
+  matchRoles(roles: string[], currentUserRoles: string[]) {
+    return roles.some((role) => currentUserRoles.includes(role));
   }
 
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const roles = this.reflector.get<string[]>('roles', context.getHandler()) || [DEFAULT_ADMINISTRATOR_ROLE];
+    const roles = this.reflector.get<string[]>(
+      'roles',
+      context.getHandler(),
+    ) || [DEFAULT_ADMINISTRATOR_ROLE];
     const user = getCurrentAdministrator(context);
-    return this.matchRoles(roles, user.role);
+    return this.matchRoles(roles, user.roles);
   }
 }

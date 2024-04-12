@@ -31,11 +31,14 @@ export class AdministratorService {
 
   async create(data: Administrator): Promise<Administrator> {
     try {
-      await this.validateCreateAdministratorRequest(data);
-      const administrator = await this.administratorRepository.create({
-        ...data,
-        password: await bcrypt.hash(data.password, 10),
-      });
+      const doc = await this.validateCreateAdministratorRequest(data);
+      if (doc) {
+        throw new UnprocessableEntityException(
+          `Email '${data.email}' already exists.`,
+        );
+      }
+
+      const administrator = await this.administratorRepository.create(data);
       return administrator;
     } catch (error) {
       throw new InternalServerErrorException(error.message);
@@ -44,20 +47,20 @@ export class AdministratorService {
 
   private async validateCreateAdministratorRequest(request: Administrator) {
     try {
-      const administrator = await this.administratorRepository.findOne({
+      return await this.administratorRepository.findOne({
         email: request.email,
       });
-      if (administrator) {
-        throw new UnprocessableEntityException('Email already exists.');
-      }
-    } catch (error) {
-      // throw new InternalServerErrorException(error.message);
-    }
+    } catch (error) {}
   }
 
   async validateAdministrator(email: string, password: string) {
     const user = await this.administratorRepository.findOne({ email });
-    this.logger.warn("======> validate admin in admin service::", JSON.stringify(user), email, password)
+    this.logger.warn(
+      '======> validate admin in admin service::',
+      JSON.stringify(user),
+      email,
+      password,
+    );
     const passwordIsValid = await bcrypt.compare(password, user.password);
     if (!passwordIsValid) {
       throw new UnauthorizedException('Credentials are not valid.');

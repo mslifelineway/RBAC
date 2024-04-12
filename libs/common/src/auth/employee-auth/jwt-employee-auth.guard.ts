@@ -6,9 +6,13 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Observable, catchError, tap } from 'rxjs';
+import { Observable, catchError, retry, tap } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
-import { VALIDATE_EMPLOYEE, VALIDATE_USER, contextTypes } from '../../constants';
+import {
+  VALIDATE_EMPLOYEE,
+  VALIDATE_USER,
+  contextTypes,
+} from '../../constants';
 import { getAuthenticationFromContext } from '../helper';
 import { AUTH_SERVICE } from '../auth.constant';
 
@@ -21,12 +25,13 @@ export class JwtEmployeeAuthGuard implements CanActivate {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    this.logger.warn('______________ JwtEmployeeAuthGuard:::',);
+    this.logger.warn('______________ JwtEmployeeAuthGuard:::');
     return this.authClient
       .send(VALIDATE_EMPLOYEE, {
         Authentication: getAuthenticationFromContext(context),
       })
       .pipe(
+        retry(3),
         tap((res) => {
           this.addUser(res, context);
         }),

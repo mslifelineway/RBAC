@@ -22,8 +22,8 @@ export class Administrator extends AbstractDocument {
   @Prop({ required: false, default: '' })
   image: string;
 
-  @Prop({ required: false, default: DEFAULT_ADMINISTRATOR_ROLE })
-  role: string;
+  @Prop({ required: false, default: [DEFAULT_ADMINISTRATOR_ROLE] })
+  roles: string[];
 
   @Prop({ required: false, default: true })
   isActive: boolean;
@@ -35,6 +35,7 @@ export class Administrator extends AbstractDocument {
   createdAt: Date;
 
   @Prop({ type: Date, default: Date.now })
-  updatedAt: Date;}
+  updatedAt: Date;
+}
 
 export const AdministratorSchema = SchemaFactory.createForClass(Administrator);

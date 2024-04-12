@@ -1,10 +1,14 @@
+import { Type } from 'class-transformer';
 import {
+  ArrayMinSize,
   IsArray,
   IsEmail,
   IsMongoId,
   IsNotEmpty,
+  IsOptional,
   IsPhoneNumber,
   Length,
+  ValidateNested,
 } from 'class-validator';
 
 export class CreateEmployeeDto {
@@ -28,8 +32,12 @@ export class CreateEmployeeDto {
   })
   phoneNumber: string;
 
-  @IsNotEmpty({ message: 'Roles are required.' })
-  @IsArray()
-  @IsMongoId({ each: true })
-  roles: string[];
+  @IsOptional()
+  @IsArray({ message: 'Roles must be an array.' })
+  @ArrayMinSize(1, { message: 'At least one role is required.' })
+  @IsMongoId({
+    each: true,
+    message: 'Each role must be a valid MongoDB ObjectID.',
+  })
+  roles?: string[];
 }
