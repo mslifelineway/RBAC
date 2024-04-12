@@ -7,6 +7,7 @@ import { RmqOptions } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(EmployeeModule);
+  app.enableCors({ origin: true, credentials: true });
   const rmqService = app.get<RmqService>(RmqService);
   app.connectMicroservice<RmqOptions>(
     rmqService.getOptions(AUTH_SERVICE, true),

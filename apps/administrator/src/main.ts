@@ -8,6 +8,7 @@ import { AUTH_SERVICE } from '@app/common/auth';
 
 async function bootstrap() {
   const app = await NestFactory.create(AdministratorModule);
+  app.enableCors({ origin: true, credentials: true });
   const rmqService = app.get<RmqService>(RmqService);
   app.connectMicroservice<RmqOptions>(
     rmqService.getOptions(AUTH_SERVICE, true),

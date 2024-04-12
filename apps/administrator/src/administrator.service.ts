@@ -30,8 +30,8 @@ export class AdministratorService {
   }
 
   async create(data: Administrator): Promise<Administrator> {
-    await this.validateCreateAdministratorRequest(data);
     try {
+      await this.validateCreateAdministratorRequest(data);
       const administrator = await this.administratorRepository.create({
         ...data,
         password: await bcrypt.hash(data.password, 10),
@@ -51,7 +51,7 @@ export class AdministratorService {
         throw new UnprocessableEntityException('Email already exists.');
       }
     } catch (error) {
-      throw new InternalServerErrorException(error.message);
+      // throw new InternalServerErrorException(error.message);
     }
   }
 

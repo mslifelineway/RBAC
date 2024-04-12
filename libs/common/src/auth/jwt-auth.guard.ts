@@ -6,7 +6,7 @@ import {
   Logger,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Observable, catchError, tap } from 'rxjs';
+import { Observable, catchError, retry, tap } from 'rxjs';
 import { AUTH_SERVICE } from './auth.constant';
 import { ClientProxy } from '@nestjs/microservices';
 import { VALIDATE_USER, contextTypes } from '../constants';
@@ -26,6 +26,7 @@ export class JwtAuthGuard implements CanActivate {
         Authentication: getAuthenticationFromContext(context),
       })
       .pipe(
+        retry(3),
         tap((res) => {
           this.addUser(res, context);
         }),
@@ -36,7 +37,7 @@ export class JwtAuthGuard implements CanActivate {
   }
 
   private addUser(user: any, context: ExecutionContext) {
-    this.logger.warn("####### adding logged in user to request ####")
+    this.logger.warn('####### adding logged in user to request ####');
     if (context.getType() === contextTypes.HTTP) {
       context.switchToRpc().getData().user = user;
     } else if (context.getType() === contextTypes.RPC) {
