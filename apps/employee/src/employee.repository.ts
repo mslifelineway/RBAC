@@ -7,7 +7,6 @@ import {
 import { Employee } from './schemas/employee.schema';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { Connection, Model } from 'mongoose';
-import { Role } from '../../role/src/schemas/role.schema';
 import { EmployeLoginDetails } from './auth/types';
 
 @Injectable()

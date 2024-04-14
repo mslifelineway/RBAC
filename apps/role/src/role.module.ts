@@ -14,7 +14,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Role, RoleSchema } from './schemas/role.schema';
 import { ROLE_SERVICE } from './constants';
 import { RoleRepository } from './role.repository';
-import { AdministratorRoleGuard } from 'apps/administrator/src/auth/guards';
+import { AdministratorRoleGuard } from '../../administrator/src/auth/guards';
+import {
+  Permission,
+  PermissionSchema,
+} from '../../permission/src/schemas/permission.schema';
 
 @Module({
   imports: [
@@ -29,7 +33,10 @@ import { AdministratorRoleGuard } from 'apps/administrator/src/auth/guards';
       envFilePath: envPaths.ROLE,
     }),
     DatabaseModule,
-    MongooseModule.forFeature([{ name: Role.name, schema: RoleSchema }]),
+    MongooseModule.forFeature([
+      { name: Role.name, schema: RoleSchema },
+      { name: Permission.name, schema: PermissionSchema },
+    ]),
     RmqModule.register({
       name: ROLE_SERVICE,
     }),

@@ -7,13 +7,18 @@ import {
 import { EmployeeRepository } from './employee.repository';
 import { Employee } from './schemas/employee.schema';
 import * as bcrypt from 'bcrypt';
-import { ProjectionType } from 'mongoose';
+import { Model, ProjectionType } from 'mongoose';
 import { EmployeLoginDetails } from './auth/types';
+import { InjectModel } from '@nestjs/mongoose';
+import { EmployeeWithRolesAndPermissions } from '@app/common/types';
 
 @Injectable()
 export class EmployeeService {
   private readonly logger = new Logger();
-  constructor(private readonly employeeRepository: EmployeeRepository) {}
+  constructor(
+    private readonly employeeRepository: EmployeeRepository,
+    @InjectModel(Employee.name) private readonly employeeModel: Model<Employee>,
+  ) {}
 
   async create(data: Employee): Promise<Employee> {
     const doc = await this.validateCreateEmployeeRequest(data);
@@ -32,8 +37,21 @@ export class EmployeeService {
     } catch (error) {}
   }
 
-  async findAll(args: Partial<Employee>): Promise<Employee[]> {
-    return await this.employeeRepository.find(args);
+  async findAll(
+    args: Partial<Employee>,
+  ): Promise<EmployeeWithRolesAndPermissions[]> {
+    return await this.employeeModel
+      .find(args, {
+        _id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        phoneNumber: true,
+      })
+      .populate({
+        path: 'roles',
+        select: { _id: true, name: true, description: true },
+      });
   }
 
   async findOne(
@@ -67,6 +85,15 @@ export class EmployeeService {
     return await this.employeeRepository.findOneAndUpdate(
       { _id: data._id },
       data,
+    );
+  }
+
+  async assignRolesToEmployee(id: string, roleIds: string[]) {
+    return await this.employeeRepository.findOneAndUpdate(
+      { _id: id },
+      {
+        roles: roleIds,
+      },
     );
   }
 

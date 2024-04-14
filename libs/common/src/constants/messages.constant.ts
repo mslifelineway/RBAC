@@ -28,4 +28,6 @@ export const messages = {
   EMPLOYEE_RECOVERED: 'Employee Recovered Successfully.',
   EMPLOYEE_LIST: 'List of all the available employee.',
   EMPLOYEE_DETAILS: 'Employee Details.',
+  ROLE_ASSIGNED: 'Roles successfully assigned',
+  PERMISSION_ASSIGNED: 'Permissions successfully assigned',
 };

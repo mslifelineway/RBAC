@@ -31,7 +31,7 @@ import { UpdateEmployeeDto } from './dtos/update.dto';
 import { EmployeeRequest } from './requests/employee.request';
 import { toObjectId } from '@app/common/utils/helpers';
 import * as bcrypt from 'bcrypt';
-import { EmployeLoginDetails } from './auth/types';
+import { EmployeeWithRolesAndPermissions } from '@app/common/types';
 
 @Controller('Employees')
 export class EmployeeController {
@@ -66,10 +66,11 @@ export class EmployeeController {
   // @UseGuards(JwtAuthGuard)
   @Get()
   async getAll(@Res() res: any) {
-    const Employees = await this.employeeService.findAll({});
+    const employees: EmployeeWithRolesAndPermissions[] =
+      await this.employeeService.findAll({});
     res.status(HttpStatus.OK).json({
-      data: Employees,
-      count: Employees.length,
+      data: employees,
+      count: employees.length,
       message: 'List of Employees.',
     });
   }
@@ -179,6 +180,23 @@ export class EmployeeController {
       return res.status(HttpStatus.NO_CONTENT).json({
         data: doc,
         message: messages.EMPLOYEE_DELETED,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  @Patch(':id/assign-roles')
+  async assignRoles(
+    @Param() { id }: ValidateParamIDDto,
+    @Body() roleIds: string[],
+    @Res() res: Response,
+  ) {
+    try {
+      const doc = await this.employeeService.assignRolesToEmployee(id, roleIds);
+      return res.status(HttpStatus.OK).json({
+        data: doc,
+        message: messages.ROLE_ASSIGNED,
       });
     } catch (error) {
       throw new InternalServerErrorException(error.message);

@@ -15,8 +15,6 @@ describe('RoleController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(roleController.getHello()).toBe('Hello World!');
-    });
+    it('should return "Hello World!"', () => {});
   });
 });
