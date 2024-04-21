@@ -1,4 +1,4 @@
-import { RequestActionsEnum } from '@app/common';
+import { RequestActionsEnum, generateUniqueString } from '@app/common';
 import { Permission } from '../schemas/permission.schema';
 import { Types } from 'mongoose';
 import { Administrator } from 'apps/administrator/src/schemas/administrator.schema';
@@ -12,6 +12,7 @@ export class PermissionRequest {
   ) {
     this.doc._id = data?._id;
     this.doc.name = data?.name;
+    this.doc.permissionUniqueKey = data?.permissionUniqueKey;
     this.doc.description = data?.description;
     this.doc.isActive = data?.isActive;
     this.doc.isDeleted = data?.isDeleted;
@@ -24,6 +25,7 @@ export class PermissionRequest {
     switch (action) {
       case RequestActionsEnum.CREATE:
         this.doc._id = new Types.ObjectId();
+        this.doc.permissionUniqueKey = generateUniqueString();
         this.doc.createdBy = administrator._id;
         this.doc.updatedBy = administrator._id;
         this.doc.createdAt = new Date();

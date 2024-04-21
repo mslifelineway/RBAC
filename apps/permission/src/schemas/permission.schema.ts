@@ -7,6 +7,9 @@ export class Permission extends AbstractDocument {
   @Prop({ unique: true, required: true, trim: true })
   name: string;
 
+  @Prop({ unique: true, required: true, trim: true })
+  permissionUniqueKey: string;
+
   @Prop({ required: true, trim: true })
   description: string;
 

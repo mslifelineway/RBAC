@@ -159,6 +159,62 @@ export class PermissionController {
   }
 
   @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
+  @Delete('/permissionUniqueKey/:permissionUniqueKey')
+  async deleteByPermissionKey(
+    @Param('permissionUniqueKey') permissionUniqueKey: string,
+    @Res() res: Response,
+  ) {
+    try {
+      const doc = await this.permissionService.deleteForever({
+        permissionUniqueKey,
+      });
+      return res.status(HttpStatus.NO_CONTENT).json({
+        data: doc,
+        message: messages.PERMISSION_DELETED,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
+  @Delete('/permissionUniqueKeys')
+  async deleteAllByPermissionKey(
+    @Body('permissionUniqueKeys') permissionUniqueKeys: string[],
+    @Res() res: Response,
+  ) {
+    try {
+      const doc = await this.permissionService.deleteManyForever({
+        permissionUniqueKey: { $in: permissionUniqueKeys },
+      });
+      return res.status(HttpStatus.NO_CONTENT).json({
+        data: doc,
+        message: messages.PERMISSION_DELETED,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
+  @Delete('/ids')
+  async deleteAllByIds(@Body('ids') ids: string[], @Res() res: Response) {
+    try {
+      const objectIdsToDelete = ids.map(id => toObjectId(id))
+      console.log('objectIdsToDelete', objectIdsToDelete)
+      const doc = await this.permissionService.deleteManyForever({
+        _id: { $in: objectIdsToDelete },
+      });
+      return res.status(HttpStatus.NO_CONTENT).json({
+        data: doc,
+        message: messages.PERMISSION_DELETED,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
+  @UseGuards(JwtAuthGuard, AdministratorRoleGuard)
   @Delete(':id')
   async delete(
     @Param() { id }: ValidateParamIDDto,

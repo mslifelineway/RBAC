@@ -25,17 +25,25 @@ export class EmployeeRepository extends AbstractRepository<Employee> {
       const doc = await this.employeeModel.findById(args._id).populate({
         path: 'roles',
         select: { _id: 1, name: 1 },
-        populate: { path: 'permissions', select: { _id: 1, name: 1 } },
+        populate: {
+          path: 'permissions',
+          select: { _id: 1, permissionUniqueKey: 1 },
+        },
       });
-      const permissions: string[] = doc.roles.reduce((acc: string[], role) => {
-        return acc.concat(
-          role.permissions.map((permission) => permission.name),
-        );
-      }, []);
+      const permissionUniqueKeys: string[] = doc.roles.reduce(
+        (acc: string[], role) => {
+          return acc.concat(
+            role.permissions.map(
+              (permission) => permission.permissionUniqueKey,
+            ),
+          );
+        },
+        [],
+      );
 
       return {
         ..._copy<Employee>(doc),
-        permissions,
+        permissionUniqueKeys,
       };
     } catch (error) {
       throw new InternalServerErrorException(error.message);

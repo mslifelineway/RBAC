@@ -82,6 +82,22 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     }
   }
 
+  async deleteOne(filterQuery: FilterQuery<TDocument>) {
+    try {
+      return await this.model.deleteOne(filterQuery);
+    } catch (error) {
+      throw new InternalServerErrorException('Error while deleting data.');
+    }
+  }
+
+  async deleteMany(filterQuery: FilterQuery<TDocument>) {
+    try {
+      return await this.model.deleteMany(filterQuery);
+    } catch (error) {
+      throw new InternalServerErrorException('Error while deleting data.');
+    }
+  }
+
   async startTransaction() {
     const session = await this.connection.startSession();
     session.startTransaction();

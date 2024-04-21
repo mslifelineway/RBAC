@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PermissionRepository } from './permission.repository';
 import { Permission } from './schemas/permission.schema';
+import { FilterQuery } from 'mongoose';
 
 @Injectable()
 export class PermissionService {
@@ -61,5 +62,11 @@ export class PermissionService {
       { _id: data._id },
       data,
     );
+  }
+  async deleteForever(filterQuery: FilterQuery<Permission>) {
+    return await this.permissionRepository.deleteOne(filterQuery);
+  }
+  async deleteManyForever(filterQuery: FilterQuery<Permission>) {
+    return await this.permissionRepository.deleteMany(filterQuery);
   }
 }

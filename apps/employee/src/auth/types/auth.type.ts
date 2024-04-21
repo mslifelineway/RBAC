@@ -13,5 +13,5 @@ export interface EmployeeRequest extends Request {
 }
 
 export type EmployeLoginDetails = Partial<Employee> & {
-  permissions: string[];
+  permissionUniqueKeys: string[];
 };
