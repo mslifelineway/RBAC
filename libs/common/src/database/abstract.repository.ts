@@ -74,12 +74,11 @@ export abstract class AbstractRepository<TDocument extends AbstractDocument> {
     });
   }
 
-  async find(filterQuery: FilterQuery<TDocument>) {
-    try {
-      return await this.model.find(filterQuery, {}, { lean: true });
-    } catch (error) {
-      throw new InternalServerErrorException('Error while fetching data.');
-    }
+  find(
+    filterQuery: FilterQuery<TDocument>,
+    projection: ProjectionType<TDocument> = {},
+  ) {
+    return this.model.find(filterQuery, projection, { lean: true });
   }
 
   async deleteOne(filterQuery: FilterQuery<TDocument>) {

@@ -1,11 +1,13 @@
 import {
   Injectable,
+  InternalServerErrorException,
   Logger,
   UnprocessableEntityException,
 } from '@nestjs/common';
 import { PermissionRepository } from './permission.repository';
 import { Permission } from './schemas/permission.schema';
 import { FilterQuery } from 'mongoose';
+import { ParentChildData, prepareParentChildData } from '@app/common';
 
 @Injectable()
 export class PermissionService {
@@ -30,7 +32,15 @@ export class PermissionService {
   }
 
   async findAll(args: Partial<Permission>): Promise<Permission[]> {
-    return await this.permissionRepository.find(args);
+    try {
+      const data: Permission[] = await this.permissionRepository.find(args);
+      // .sort({ parent: 1 });
+      // return prepareParentChildData<Permission>(data);
+      return data;
+    } catch (error) {
+      this.logger.warn(error.message);
+      throw new InternalServerErrorException(error);
+    }
   }
 
   async findOne(args: Partial<Permission>): Promise<Permission> {

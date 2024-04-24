@@ -13,6 +13,7 @@ export class PermissionRequest {
     this.doc._id = data?._id;
     this.doc.name = data?.name;
     this.doc.permissionUniqueKey = data?.permissionUniqueKey;
+    this.doc.parent = data?.parent;
     this.doc.description = data?.description;
     this.doc.isActive = data?.isActive;
     this.doc.isDeleted = data?.isDeleted;

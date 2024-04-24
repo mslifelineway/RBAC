@@ -20,7 +20,14 @@ export class AdministratorService {
   async getAdministrators(
     getAdministratorsArgs: Partial<Administrator>,
   ): Promise<Administrator[]> {
-    return await this.administratorRepository.find(getAdministratorsArgs);
+    try {
+      return await this.administratorRepository.find(getAdministratorsArgs);
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Error while fetching administrator data',
+        error.message,
+      );
+    }
   }
 
   async getAdministrator(

@@ -66,7 +66,7 @@ export class PermissionController {
     const permissions = await this.permissionService.findAll({});
     res.status(HttpStatus.OK).json({
       data: permissions,
-      count: permissions.length,
+      count: permissions?.length,
       message: 'List of permissions.',
     });
   }
@@ -200,8 +200,8 @@ export class PermissionController {
   @Delete('/ids')
   async deleteAllByIds(@Body('ids') ids: string[], @Res() res: Response) {
     try {
-      const objectIdsToDelete = ids.map(id => toObjectId(id))
-      console.log('objectIdsToDelete', objectIdsToDelete)
+      const objectIdsToDelete = ids.map((id) => toObjectId(id));
+      console.log('objectIdsToDelete', objectIdsToDelete);
       const doc = await this.permissionService.deleteManyForever({
         _id: { $in: objectIdsToDelete },
       });

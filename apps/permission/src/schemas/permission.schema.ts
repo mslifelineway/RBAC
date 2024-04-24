@@ -19,6 +19,13 @@ export class Permission extends AbstractDocument {
   @Prop({ required: false, default: false })
   isDeleted: boolean;
 
+  @Prop({
+    required: false,
+    type: SchemaTypes.ObjectId,
+    ref: 'Permission',
+  })
+  parent?: Types.ObjectId;
+
   @Prop({ required: true, type: SchemaTypes.ObjectId, ref: 'Administrator' })
   createdBy: Types.ObjectId;
 
